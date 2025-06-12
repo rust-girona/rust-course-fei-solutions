@@ -15,6 +15,33 @@
 // It rhymes with "Jack" :)
 // You don't even need to implement it fully, just use Vec and perform two operations on it.
 
+pub fn match_parentheses(s: &str) -> bool {
+    let mut stack = Vec::new();
+
+    for c in s.chars() {
+        match c {
+            '(' | '[' | '{' => stack.push(c),
+            ')' => {
+                if stack.pop() != Some('(') {
+                    return false;
+                }
+            }
+            ']' => {
+                if stack.pop() != Some('[') {
+                    return false;
+                }
+            }
+            '}' => {
+                if stack.pop() != Some('{') {
+                    return false;
+                }
+            }
+            _ => {}
+        }
+    }
+    stack.is_empty()
+}
+
 /// Below you can find a set of unit tests.
 #[cfg(test)]
 mod tests {
