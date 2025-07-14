@@ -12,14 +12,21 @@
 /// Your task is to write a set (at least 8) of unit tests, use them to find (at least 2) bugs in
 /// this function and then fix the function.
 fn sanitize(input: &str) -> &str {
-    // Remove all x from the end of the string
-    let input = input.trim_end_matches("x");
-    // Remove all o from the end of the string
-    let mut input = input.trim_end_matches("o");
+    let mut input = input;
 
-    // Remove .exe from the end
-    if input.ends_with(".exe") {
-        input = &input[0..input.len() - 4];
+    loop {
+        let prev_len = input.len();
+
+        // Remove all x from the end of the string
+        input = input.trim_end_matches("x");
+        // Remove all o from the end of the string
+        input = input.trim_end_matches("o");
+        // Remove .exe from the end
+        input = input.trim_end_matches(".exe");
+
+        if prev_len == input.len() {
+            break;
+        }
     }
 
     input
