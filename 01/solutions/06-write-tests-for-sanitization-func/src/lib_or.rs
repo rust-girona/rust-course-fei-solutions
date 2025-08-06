@@ -13,9 +13,8 @@
 ///
 /// Your task is to write a set (at least 8) of unit tests, use them to find (at least 2) bugs in
 /// this function and then fix the function.
-/// 
+
 fn sanitize(input: &str) -> &str {
-    // Remove all x from the end of the string
     let mut mark = true;
     let mut input1 = input;
 
@@ -32,8 +31,7 @@ fn sanitize(input: &str) -> &str {
         else
         if input1.ends_with(".exe"){
             mark = true;
-            input1 = &input1[0..input1.len() - 4];
-            // input1 = input1.trim_end_matches(".exe");
+            input1 = input1.trim_end_matches(".exe");
         }
         else{
             mark = false;
@@ -42,12 +40,6 @@ fn sanitize(input: &str) -> &str {
     input1
 }
 
-/// TODO: write tests for the `sanitize` function
-///
-/// Bonus: can you find any bugs using the [proptest](https://proptest-rs.github.io/proptest/intro.html)
-/// crate?
-/// Note that you will probably need to run `cargo test` with the `PROPTEST_DISABLE_FAILURE_PERSISTENCE=1`
-/// environment variable to make proptest work for tests stored in the `tests` directory.
 #[cfg(test)]
 mod pepe {
     use super::sanitize;
@@ -88,14 +80,4 @@ mod pepe {
         assert_eq!(sanitize(".exei.exe"), ".exei");
     }
 
-    /* 
-    #[test]
-    fn test_x(){
-        let mut xx="xx";
-        match sanitize(xx) {
-
-        }
-        panic!("Panic")
-    }
-    */
 }
