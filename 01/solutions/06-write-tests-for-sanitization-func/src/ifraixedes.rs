@@ -166,3 +166,22 @@ mod tests {
         );
     }
 }
+
+#[cfg(test)]
+mod porptest {
+    use super::*;
+    use proptest::prelude::*;
+
+    proptest! {
+        #[test]
+        fn mixed_inputs(first_part in ".*".prop_filter("input cannot ends with 'o', 'x', or '.exe'",
+                |first_part| !(first_part.ends_with(['o', 'x']) || first_part.ends_with(".exe"))),
+                last_part in r#"(o|x|\.exe)*"#,
+        ) {
+           let  input = format!("{first_part}{last_part}");
+           let sanitized = sanitize(&input);
+            prop_assert_eq!(first_part, sanitized);
+        }
+
+    }
+}
