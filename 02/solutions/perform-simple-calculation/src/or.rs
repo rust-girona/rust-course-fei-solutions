@@ -10,23 +10,27 @@
 // operation should be performed on it.
 // Hint: max(..) and min(..) methods of `i32` might come in handy.
 
-pub enum Op {
+enum Op {
     Add(i32),
     Sub(i32),
-    Clamp { low: i32, high: i32}
+    Clamp { low: i32, high: i32 },
 }
 
-pub fn perform_calculation(x:i32, op: Op  ) -> i32 {
-    let mut y = x;
-    /* 
-    case op {
-        Add
-
+fn perform_calculation(x: i32, op: Op) -> i32 {
+    match op {
+        Op::Add(y) => x + y,
+        Op::Sub(y) => x - y,
+        Op::Clamp { low, high } => {
+            if x < low {
+                low
+            } else if x > high {
+                high
+            } else {
+                x
+            }
+        }
     }
-*/
-    y
 }
-
 
 /// Below you can find a set of unit tests.
 #[cfg(test)]
