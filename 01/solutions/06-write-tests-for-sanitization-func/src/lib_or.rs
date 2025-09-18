@@ -18,22 +18,17 @@ fn sanitize(input: &str) -> &str {
     let mut mark = true;
     let mut input1 = input;
 
-    while mark && input1.len()>0 {
-        if input1.ends_with("x"){
+    while mark && input1.len() > 0 {
+        if input1.ends_with("x") {
             mark = true;
             input1 = input1.trim_end_matches("x");
-        }
-        else
-        if input1.ends_with("o"){
+        } else if input1.ends_with("o") {
             mark = true;
             input1 = input1.trim_end_matches("o");
-        }
-        else
-        if input1.ends_with(".exe"){
+        } else if input1.ends_with(".exe") {
             mark = true;
             input1 = input1.trim_end_matches(".exe");
-        }
-        else{
+        } else {
             mark = false;
         }
     }
@@ -79,5 +74,4 @@ mod pepe {
     fn test_exe2() {
         assert_eq!(sanitize(".exei.exe"), ".exei");
     }
-
 }
