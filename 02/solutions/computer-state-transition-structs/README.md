@@ -1,4 +1,4 @@
-# 02 Computer State Transition
+# 03 Computer State Transition (structs)
 
 This is a lib crate.
 Each different solution is implemented in a module.
