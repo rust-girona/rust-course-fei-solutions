@@ -57,14 +57,15 @@ impl ComputerState {
         }
     }
 
-    fn sleep(&mut self) {
-        self.status = ComputerStatus::Sleeping;
-        self.idle_time = 0;
-        self.sleep_time = 0;
+    fn print_state(&self) {
+        println!("Status: {:?}", self.status);
+        println!("Uptime: {}", self.uptime);
+        println!("Idle Time: {}", self.idle_time);
+        println!("Sleep Time: {}", self.sleep_time);
     }
 
     fn is_on(&self) -> bool {
-        self.status == ComputerStatus::On
+        self.status != ComputerStatus::Off
     }
     fn is_off(&self) -> bool {
         self.status == ComputerStatus::Off
@@ -98,36 +99,42 @@ pub fn pc_transition(mut computer: ComputerState, event: Event) -> ComputerState
             }
         }
         Event::TurnOff => {
-            computer = ComputerState::new_off();
+            if computer.is_on() {
+                computer = ComputerState::new_off();
+            }
         }
         Event::PassTime(t) => match computer.status {
             ComputerStatus::On => {
                 computer.uptime += t;
                 computer.idle_time += t;
-                if computer.idle_time > 1000 {
+                if computer.idle_time > 1500 {
+                    computer = ComputerState::new_off();
+                } else if computer.idle_time > 1000 {
                     computer.status = ComputerStatus::Sleeping;
+                    computer.sleep_time = computer.idle_time - 1000;
+                    computer.idle_time = 0;
                 }
             }
             ComputerStatus::Sleeping => {
                 computer.sleep_time += t;
                 if computer.sleep_time > 500 {
-                    computer.status = ComputerStatus::Off;
+                    computer = ComputerState::new_off();
+                } else {
+                    computer.idle_time = 0;
+                    computer.uptime += t;
                 }
             }
             ComputerStatus::Off => {}
         },
-        Event::MoveMouse => match computer.status {
-            ComputerStatus::On => {
-                computer.idle_time = 0;
+        Event::MoveMouse => {
+            if computer.status == ComputerStatus::Sleeping {
+                computer.status = ComputerStatus::On;
             }
-            ComputerStatus::Sleeping => {
-                computer = ComputerState::new_on();
-            }
-            ComputerStatus::Off => {}
-        },
+            computer.idle_time = 0;
+            computer.sleep_time = 0;
+        }
     }
     computer
-    // todo!()
 }
 
 /// Below you can find a set of unit tests.
@@ -384,6 +391,7 @@ mod tests {
         ];
         for event in events {
             pc = pc_transition(pc, event);
+            pc.print_state();
         }
         assert!(pc.is_on());
         assert!(pc.is_sleeping());
