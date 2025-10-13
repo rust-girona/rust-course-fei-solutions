@@ -1,7 +1,14 @@
 //! Run this file with `cargo test --test 01_factorial`.
 
 // TODO: Implement a simple factorial function.
-
+fn factorial(n: u8) -> u8 {
+    if n==0{
+        return 1
+    }
+    else{
+        return n*factorial(n-1)
+    }
+}
 /// Below you can find a set of unit tests.
 #[cfg(test)]
 mod tests {
