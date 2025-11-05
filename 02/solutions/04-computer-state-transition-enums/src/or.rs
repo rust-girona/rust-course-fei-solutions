@@ -51,10 +51,68 @@ enum Event {
 // Compare this approach with using a struct (which we did on the lesson).
 // Is it easier with an enum or with a struct?
 
+pub fn pc_transition(mut computer: ComputerState, event: Event) -> ComputerState {
+    match event {
+        Event::TurnOn => {
+            if computer == ComputerState::Off {
+                computer = ComputerState::Running {
+                    uptime: 0,
+                    idle_time: 0,
+                };
+            }
+        }
+        Event::TurnOff => {
+            if computer != ComputerState::Off {
+                computer = ComputerState::Off;
+            }
+        }
+        Event::MoveMouse => match computer {
+            ComputerState::Sleeping { uptime, sleep_time } => {
+                computer = ComputerState::Running {
+                    uptime,
+                    idle_time: 0,
+                };
+            }
+            ComputerState::Running { uptime, idle_time } => {
+                computer = ComputerState::Running {
+                    uptime,
+                    idle_time: 0,
+                };
+            }
+            _ => {}
+        },
+        Event::PassTime(time) => match computer {
+            ComputerState::Running { uptime, idle_time } => {
+                computer = ComputerState::Running {
+                    uptime: uptime + time,
+                    idle_time: idle_time + time,
+                };
+                if idle_time > 1000 {
+                    computer = ComputerState::Sleeping {
+                        uptime,
+                        sleep_time: 0,
+                    };
+                }
+            }
+            ComputerState::Sleeping { uptime, sleep_time } => {
+                computer = ComputerState::Sleeping {
+                    uptime,
+                    sleep_time: sleep_time + time,
+                };
+                if sleep_time > 500 {
+                    computer = ComputerState::Off;
+                }
+            }
+            _ => {}
+        },
+    }
+    computer
+}
+
 /// Below you can find a set of unit tests.
 #[cfg(test)]
 mod tests {
-    use crate::{pc_transition, ComputerState, Event};
+    use crate::{ComputerState, Event, pc_transition};
 
     #[test]
     fn turn_off_when_off() {
