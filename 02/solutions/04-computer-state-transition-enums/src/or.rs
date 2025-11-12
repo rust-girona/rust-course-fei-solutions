@@ -83,24 +83,35 @@ pub fn pc_transition(mut computer: ComputerState, event: Event) -> ComputerState
         },
         Event::PassTime(time) => match computer {
             ComputerState::Running { uptime, idle_time } => {
-                computer = ComputerState::Running {
-                    uptime: uptime + time,
-                    idle_time: idle_time + time,
-                };
-                if idle_time > 1000 {
-                    computer = ComputerState::Sleeping {
-                        uptime,
-                        sleep_time: 0,
+                let new_uptime = uptime + time;
+                let new_idle_time = idle_time + time;
+                if new_idle_time > 1000 {
+                    let new_sleep_time = new_idle_time - 1000;
+                    if new_sleep_time > 500 {
+                        computer = ComputerState::Off;
+                    } else {
+                        computer = ComputerState::Sleeping {
+                            uptime: new_uptime,
+                            sleep_time: new_sleep_time,
+                        };
+                    }
+                } else {
+                    computer = ComputerState::Running {
+                        uptime: new_uptime,
+                        idle_time: new_idle_time,
                     };
                 }
             }
             ComputerState::Sleeping { uptime, sleep_time } => {
-                computer = ComputerState::Sleeping {
-                    uptime,
-                    sleep_time: sleep_time + time,
-                };
-                if sleep_time > 500 {
+                let new_uptime = uptime + time;
+                let new_sleep_time = sleep_time + time;
+                if new_sleep_time > 500 {
                     computer = ComputerState::Off;
+                } else {
+                    computer = ComputerState::Sleeping {
+                        uptime: new_uptime,
+                        sleep_time: new_sleep_time,
+                    };
                 }
             }
             _ => {}
@@ -112,7 +123,7 @@ pub fn pc_transition(mut computer: ComputerState, event: Event) -> ComputerState
 /// Below you can find a set of unit tests.
 #[cfg(test)]
 mod tests {
-    use crate::{ComputerState, Event, pc_transition};
+    use super::{ComputerState, Event, pc_transition};
 
     #[test]
     fn turn_off_when_off() {
