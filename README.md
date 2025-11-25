@@ -31,7 +31,7 @@ this repository:
 16. [03/04 - Interleave strings](03/exercises/tests/03_interleave.rs) (strings)
 17. [03/05 - Merge sorted slices](03/exercises/tests/04_merge_slices.rs) (slices)
 18. [03/06 - Bubble sort](03/exercises/tests/05_bubble_sort.rs) (slices)
-19. [03/06 - Zero-copy parsing](03/exercises/tests/06_zerocopy_parsing.rs) (lifetimes in structs, parsing)
+19. [03/07 - Zero-copy parsing](03/exercises/tests/06_zerocopy_parsing.rs) (lifetimes in structs, parsing)
 20. [04/01 - Shape interface](04/exercises/tests/01_shape.rs) (traits)
 21. [04/02 - Case-insensitive comparator](04/exercises/tests/02_case_insensitive_cmp.rs) (traits, iterators)
 22. [04/03 - Fibonacci iterator](04/exercises/tests/03_fibonacci.rs) (iterators)
