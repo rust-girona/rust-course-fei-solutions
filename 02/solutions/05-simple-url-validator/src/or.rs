@@ -25,10 +25,88 @@
 // Hint: Put `#[derive(Debug, Eq, PartialEq)]` on top of `SRL` and `SRLValidationError`,
 // so that asserts in tests work.
 
+/*
+use std::fmt;
+#[derive(Debug, Clone)]
+struct EmptyAddress;
+
+impl fmt::Display for EmptyAddress {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "invalid empty address")
+    }
+}
+ */
+
+pub mod srl {
+    #[derive(Debug, Eq, PartialEq)]
+    pub enum SRLValidationError {
+        EmptyAddress,
+        EmptyProtocol,
+        InvalidCharacterInProtocol(char),
+        InvalidCharacterInAddress(char),
+    }
+
+    #[derive(Debug, Eq, PartialEq)]
+    pub struct SRL {
+        protocol: Option<String>,
+        address: String,
+    }
+
+    impl SRL {
+        pub fn new(srl_str: &str) -> Result<Self, SRLValidationError> {
+            if srl_str.is_empty() {
+                return Err(SRLValidationError::EmptyAddress);
+            }
+
+            let parts: Vec<&str> = srl_str.split("://").collect();
+            let (protocol_opt, address_str) = match parts.len() {
+                1 => (None, parts[0]),
+                2 => {
+                    if parts[0].is_empty() {
+                        return Err(SRLValidationError::EmptyProtocol);
+                    }
+                    (Some(parts[0]), parts[1])
+                }
+                _ => return Err(SRLValidationError::InvalidCharacterInAddress(':')),
+            };
+
+            if address_str.is_empty() {
+                return Err(SRLValidationError::EmptyAddress);
+            }
+
+            if let Some(protocol) = protocol_opt {
+                for c in protocol.chars() {
+                    if !c.is_ascii_lowercase() {
+                        return Err(SRLValidationError::InvalidCharacterInProtocol(c));
+                    }
+                }
+            }
+
+            for c in address_str.chars() {
+                if !c.is_ascii_lowercase() {
+                    return Err(SRLValidationError::InvalidCharacterInAddress(c));
+                }
+            }
+
+            Ok(SRL {
+                protocol: protocol_opt.map(String::from),
+                address: String::from(address_str),
+            })
+        }
+
+        pub fn get_protocol(&self) -> Option<&str> {
+            self.protocol.as_deref()
+        }
+
+        pub fn get_address(&self) -> &str {
+            &self.address
+        }
+    }
+}
 /// Below you can find a set of unit tests.
 #[cfg(test)]
 mod tests {
-    use super::srl::{SRLValidationError, SRL};
+    use super::srl::{SRL, SRLValidationError};
 
     #[test]
     fn empty_address() {
