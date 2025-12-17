@@ -3,4 +3,10 @@ name = "brainfuck-interpreter"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "or_interpret"
+path = "src/or_interpret.rs"
+
 [dependencies]
+env_logger = "0.10.0"
+log = "0.4.19"
