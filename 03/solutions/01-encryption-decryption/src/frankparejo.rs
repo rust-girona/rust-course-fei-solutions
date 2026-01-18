@@ -26,43 +26,50 @@
 // To debug the tests, try to remove the `compile_fail` attribute and run `cargo test` to see what
 // happens. Once they fail because of the correct error (move semantics), put `compile_fail` back.
 
+use std::collections::VecDeque;
+
 pub struct Data {
-    values: Vec<u8>,
+    values: VecDeque<u8>,
 }
 
 impl Data {
     pub fn new(values: Vec<u8>) -> Self {
-        Self { values }
+        Self {
+            values: VecDeque::from(values),
+        }
     }
 
     pub fn read(&mut self) -> Option<u8> {
-        if self.values.len() == 0 {
+        if self.values.is_empty() {
             return None;
         }
 
-        Some(self.values.remove(0))
+        self.values.pop_front()
     }
 
     pub fn encrypt(self, key: u8) -> EncryptedData {
         EncryptedData {
             values: self.values,
-            key: key,
+            key,
         }
     }
 }
 
 pub struct EncryptedData {
-    values: Vec<u8>,
+    values: VecDeque<u8>,
     key: u8,
 }
 
 impl EncryptedData {
     pub fn read(&mut self) -> Option<u8> {
-        if self.values.len() == 0 {
+        if self.values.is_empty() {
             return None;
         }
 
-        Some(self.values.remove(0) ^ self.key)
+        match self.values.pop_front() {
+            Some(value) => Some(value ^ self.key),
+            None => None,
+        }
     }
 
     pub fn decrypt(self, key: u8) -> Result<Data, Self> {
