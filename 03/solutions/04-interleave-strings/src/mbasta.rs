@@ -17,18 +17,16 @@ fn interleave(a: &str, b: &str) -> String {
     let mut done_b = false;
 
     loop {
-        if !done_a {
-            match ita.next() {
-                Some(ch) => res.push(ch),
-                None => done_a = true,
-            }
+        if let Some(ch) = ita.next() {
+            res.push(ch);
+        } else {
+            done_a = true;
         }
 
-        if !done_b {
-            match itb.next() {
-                Some(ch) => res.push(ch),
-                None => done_b = true,
-            }
+        if let Some(ch) = itb.next() {
+            res.push(ch);
+        } else {
+            done_b = true;
         }
 
         if done_a && done_b {
