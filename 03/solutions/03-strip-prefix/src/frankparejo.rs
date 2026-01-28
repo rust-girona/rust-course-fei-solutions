@@ -5,8 +5,8 @@
 //
 // Hint: you can use `string.chars()` for iterating the Unicode characters of a string.
 
-fn strip_prefix<'a, 'b>(word: &'a str, prefix: &'a str) -> &'b str {
-    for c in word.chars() {}
+fn strip_prefix<'a, 'b>(word: &'a str, prefix: &str) -> &'a str {
+    word.trim_start_matches(|c| prefix.contains(c))
 }
 
 /// Below you can find a set of unit tests.
