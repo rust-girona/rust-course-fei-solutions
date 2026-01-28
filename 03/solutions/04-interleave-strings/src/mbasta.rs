@@ -10,9 +10,31 @@
 // Hint: you can use `string.chars()` to create an iterator over the Unicode characters of a string.
 
 fn interleave(a: &str, b: &str) -> String {
-    let ita = a.chars();
-    let itb = b.chars();
-    ita.zip(itb).flat_map(|(x, y)| [x, y]).collect()
+    let mut ita = a.chars();
+    let mut itb = b.chars();
+    let mut res = String::with_capacity(a.len() + b.len());
+    let mut done_a = false;
+    let mut done_b = false;
+
+    loop {
+        if !done_a {
+            match ita.next() {
+                Some(ch) => res.push(ch),
+                None => done_a = true,
+            }
+        }
+
+        if !done_b {
+            match itb.next() {
+                Some(ch) => res.push(ch),
+                None => done_b = true,
+            }
+        }
+
+        if done_a && done_b {
+            return res;
+        }
+    }
 }
 
 /// Below you can find a set of unit tests.
