@@ -11,39 +11,28 @@
 
 fn interleave(s1: &str, s2: &str) -> String {
     let result = String::new();
+    let s1_len = s1.chars().count();
+    let s2_len = s2.chars().count();
 
     // Zipping the s1 string works fine when s1 and s2 have the same length. When they have
     // different, the result is not what we are expecting for this particular solution. The
     // reason is because .zip method stops as soon as one of the iterators ends, which means that
-    // the longest string will be shrinked. That's why we need the missing_chars calculation.
-    let result = s1
-        .chars()
+    // the longest string will be shrinked. That's why we need the to chain the missing chars.
+    s1.chars()
         .zip(s2.chars())
         .fold(result, |mut acc, (c1, c2)| {
             acc.push(c1);
             acc.push(c2);
 
             acc
-        });
-
-    let result_len = result.chars().count();
-    let s1_len = s1.chars().count();
-    let s2_len = s2.chars().count();
-
-    // We calculate the missing chars by substracting the length of the smallest string to the
-    // zipped result, but why the smallest string? Well, because all characters of the it are
-    // already part of the zipped result.
-    let missing_chars = if s2_len > s1_len {
-        let chars_to_skip = result_len - s1_len;
-
-        s2.chars().skip(chars_to_skip)
-    } else {
-        let chars_to_skip = result_len - s2_len;
-
-        s1.chars().skip(chars_to_skip)
-    };
-
-    result.chars().chain(missing_chars).collect()
+        })
+        .chars()
+        .chain(if s2_len > s1_len {
+            s2.chars().skip(s1_len)
+        } else {
+            s1.chars().skip(s2_len)
+        })
+        .collect()
 }
 
 /// Below you can find a set of unit tests.
