@@ -10,9 +10,9 @@
 // Hint: you can use `string.chars()` to create an iterator over the Unicode characters of a string.
 
 fn interleave(s1: &str, s2: &str) -> String {
-    let result = String::new();
     let s1_len = s1.chars().count();
     let s2_len = s2.chars().count();
+    let result = String::with_capacity(s1_len + s2_len);
 
     // Zipping the s1 string works fine when s1 and s2 have the same length. When they have
     // different, the result is not what we are expecting for this particular solution. The
