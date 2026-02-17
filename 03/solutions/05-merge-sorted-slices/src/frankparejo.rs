@@ -49,10 +49,22 @@ fn merge_slices(s1: &[u32], s2: &[u32]) -> Vec<u32> {
     merged_slices
 }
 
+fn merge_sort(s: &[u32]) -> Vec<u32> {
+    let len = s.len();
+
+    if len <= 1 {
+        Vec::from(s)
+    } else {
+        let half = len.div_ceil(2);
+
+        merge_slices(&merge_sort(&s[0..half]), &merge_sort(&s[half..]))
+    }
+}
+
 /// Below you can find a set of unit tests.
 #[cfg(test)]
 mod tests {
-    use super::merge_slices;
+    use super::{merge_slices, merge_sort};
 
     #[test]
     fn merge_slices_empty() {
@@ -90,5 +102,15 @@ mod tests {
     #[test]
     fn merge_slices_second_empty() {
         assert_eq!(merge_slices(&[1, 9, 11], &[]), vec![1, 9, 11]);
+    }
+
+    #[test]
+    fn merge_sort_basic() {
+        assert_eq!(merge_sort(&[1, 3, 5, 2, 4, 6]), vec![1, 2, 3, 4, 5, 6]);
+    }
+
+    #[test]
+    fn merge_sort_duplicates() {
+        assert_eq!(merge_sort(&[1, 1, 3, 1, 3, 4]), vec![1, 1, 1, 3, 3, 4]);
     }
 }
