@@ -2,31 +2,19 @@
 
 // TODO: Write a simple bubble sort implementation that receives a unique (mutable) reference
 // to a slice of numbers and sorts them in-place.
-
-fn bubble_sort(s: &mut [i64]) {
-    if s.is_empty() {
+//
+pub fn bubble_sort(numbers: &mut [i64]) {
+    if numbers.len() <= 1 {
         return;
     }
-
-    let len = s.len();
-
-    loop {
-        let mut i = 0;
-        let mut swapped = false;
-
-        while i < len - 1 {
-            let j = i + 1;
-
-            if s[i] > s[j] {
-                s.swap(i, j);
+    let mut swapped = true;
+    while swapped {
+        swapped = false;
+        for i in 0..numbers.len() - 1 {
+            if numbers[i] > numbers[i + 1] {
+                numbers.swap(i, i + 1);
                 swapped = true;
             }
-
-            i += 1;
-        }
-
-        if !swapped {
-            break;
         }
     }
 }
@@ -85,7 +73,8 @@ mod tests {
     #[test]
     fn shuffle() {
         let mut data: Vec<_> = (0..1000).collect();
-        data.shuffle(&mut rand::thread_rng());
+        //data.shuffle(&mut rand::thread_rng());
+        data.shuffle(&mut rand::rng());
 
         test_sort(&mut data, &(0..1000).collect::<Vec<_>>());
     }
