@@ -4,21 +4,30 @@
 // to a slice of numbers and sorts them in-place.
 
 fn bubble_sort(s: &mut [i64]) {
+    if s.is_empty() {
+        return;
+    }
+
     let len = s.len();
-    let mut i = 0;
 
-    while i < len {
-        let mut j = i + 1;
+    loop {
+        let mut i = 0;
+        let mut swapped = false;
 
-        while j < len {
+        while i < len - 1 {
+            let j = i + 1;
+
             if s[i] > s[j] {
                 s.swap(i, j);
+                swapped = true;
             }
 
-            j += 1;
+            i += 1;
         }
 
-        i += 1;
+        if !swapped {
+            break;
+        }
     }
 }
 
