@@ -1,0 +1,7 @@
+# This is a workspace, which combine several crates together.
+# They all share the same target directory, compilation options, profiles, etc.
+[workspace]
+members = [
+	"displayme",
+	"assignment",
+]
