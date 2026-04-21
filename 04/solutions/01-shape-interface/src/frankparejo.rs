@@ -36,8 +36,8 @@ struct Circle {
 }
 
 impl Circle {
-    fn new(diameter: f64) -> Self {
-        Self { radius: diameter }
+    fn new(radius: f64) -> Self {
+        Self { radius }
     }
 }
 
