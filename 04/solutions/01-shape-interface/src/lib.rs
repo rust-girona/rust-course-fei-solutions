@@ -2,3 +2,4 @@
 
 mod frankparejo;
 mod ifraixedes;
+mod magonxesp;
