@@ -1,0 +1,132 @@
+name: PR solutions check
+
+on:
+  pull_request:
+    paths:
+      - "[0-1][0-9]/solutions/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  RUST_VERSION: "1.85.0"
+
+jobs:
+  detect:
+    name: Detect changed crates
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      crates: ${{ steps.crates.outputs.crates }}
+
+    steps:
+      - name: Checkout
+        uses: &checkout actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed solution crates
+        id: crates
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -eo pipefail
+          roots=$(mktemp)
+          trap 'rm -f "$roots"' EXIT
+
+          while IFS= read -r -d '' file; do
+            dir=$(dirname "$file")
+            root=
+
+            while [[ "$dir" == [0-1][0-9]/solutions* ]]; do
+              if [[ -f "$dir/Cargo.toml" ]]; then
+                root=${root:-"$dir"}
+                grep -q '^\[workspace\]' "$dir/Cargo.toml" && root=$dir
+              fi
+              dir=${dir%/*}
+            done
+
+            [[ -n "$root" ]] && printf '%s\n' "$root" >> "$roots"
+          done < <(
+            git diff --name-only -z --diff-filter=ACMRTD \
+              "$BASE_SHA" "$HEAD_SHA" -- '[0-1][0-9]/solutions/**'
+          )
+
+          echo "Crates to check:"
+          sort -u "$roots"
+
+          crates=$(sort -u "$roots" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          echo "crates=$crates" >> "$GITHUB_OUTPUT"
+
+  format:
+    name: Format — ${{ matrix.crate }}
+    needs: detect
+    if: needs.detect.outputs.crates != '[]'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: ${{ fromJSON(needs.detect.outputs.crates) }}
+
+    steps:
+      - name: Checkout
+        uses: *checkout
+
+      - name: Install Rust and rustfmt
+        run: rustup toolchain install "$RUST_VERSION" --profile minimal --component rustfmt
+
+      - name: Check format
+        working-directory: ${{ matrix.crate }}
+        run: cargo +"$RUST_VERSION" fmt --all -- --check
+
+  clippy:
+    name: Clippy — ${{ matrix.crate }}
+    needs: detect
+    if: needs.detect.outputs.crates != '[]'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: ${{ fromJSON(needs.detect.outputs.crates) }}
+
+    steps:
+      - name: Checkout
+        uses: *checkout
+
+      - name: Install Rust and Clippy
+        run: rustup toolchain install "$RUST_VERSION" --profile minimal --component clippy
+
+      - name: Run Clippy
+        working-directory: ${{ matrix.crate }}
+        run: cargo +"$RUST_VERSION" clippy --all-targets -- -D warnings
+
+  test:
+    name: Tests — ${{ matrix.crate }}
+    needs: detect
+    if: needs.detect.outputs.crates != '[]'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: ${{ fromJSON(needs.detect.outputs.crates) }}
+
+    steps:
+      - name: Checkout
+        uses: *checkout
+
+      - name: Install Rust
+        run: rustup toolchain install "$RUST_VERSION" --profile minimal
+
+      - name: Run tests
+        working-directory: ${{ matrix.crate }}
+        run: cargo +"$RUST_VERSION" test
