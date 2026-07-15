@@ -31,7 +31,7 @@ impl Range1D {
         if start > end {
             Err(String::from("Start must not be larger than end"))
         } else {
-            Ok(Self{start, end})
+            Ok(Self { start, end })
         }
     }
 
@@ -47,7 +47,7 @@ impl Range1D {
         self.start
     }
 
-    fn end(&self)-> u64 {
+    fn end(&self) -> u64 {
         self.end
     }
 
@@ -71,15 +71,14 @@ impl Range1D {
         if end < self.start || start > self.end {
             None
         } else {
-            Some(Self{start, end})
+            Some(Self { start, end })
         }
-     }
+    }
 
-    fn iter(&self) -> impl Iterator<Item=u64>  {
+    fn iter(&self) -> impl Iterator<Item = u64> {
         let it = std::range::RangeInclusive::from(self.start..=self.end);
         it.into_iter()
     }
-
 }
 
 /// Below you can find a set of unit tests.
